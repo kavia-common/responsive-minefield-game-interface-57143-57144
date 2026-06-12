@@ -1,0 +1,128 @@
+.wrap {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  border-bottom: 1px solid rgba(17, 24, 39, 0.08);
+  background: linear-gradient(to bottom, rgba(17, 24, 39, 0.02), rgba(17, 24, 39, 0.01));
+}
+
+.left {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 110px;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: rgba(17, 24, 39, 0.65);
+}
+
+.statValue {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.mono {
+  font-variant-numeric: tabular-nums;
+}
+
+.mutedMono {
+  font-variant-numeric: tabular-nums;
+  color: rgba(17, 24, 39, 0.55);
+  font-weight: 650;
+}
+
+.statSlash {
+  color: rgba(17, 24, 39, 0.3);
+}
+
+.mutedSuffix {
+  font-size: 13px;
+  color: rgba(17, 24, 39, 0.55);
+  font-weight: 650;
+}
+
+.selectWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.selectLabel {
+  font-size: 12px;
+  color: rgba(17, 24, 39, 0.65);
+}
+
+.select {
+  appearance: none;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 9px 10px;
+  min-width: 210px;
+  box-shadow: 0 1px 0 rgba(17, 24, 39, 0.03);
+}
+
+.select:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.3);
+  outline-offset: 2px;
+}
+
+.resetBtn {
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  background: rgba(59, 130, 246, 0.08);
+  color: #1d4ed8;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(17, 24, 39, 0.03);
+}
+
+.resetBtn:hover {
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.resetBtn:active {
+  transform: translateY(0.5px);
+}
+
+/* Small screens: stack controls gracefully */
+@media (max-width: 520px) {
+  .wrap {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .right {
+    justify-content: space-between;
+  }
+
+  .select {
+    min-width: 0;
+    width: min(100%, 360px);
+  }
+}
