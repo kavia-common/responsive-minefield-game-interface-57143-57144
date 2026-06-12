@@ -14,6 +14,15 @@
     border-color 120ms ease;
 }
 
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.92;
+}
+
+.cell:disabled {
+  cursor: not-allowed;
+}
+
 .hidden {
   background: #ffffff;
   box-shadow:
@@ -24,6 +33,11 @@
 .hidden:hover {
   border-color: rgba(59, 130, 246, 0.35);
   background: rgba(59, 130, 246, 0.06);
+}
+
+.cell:disabled.hidden:hover {
+  border-color: rgba(17, 24, 39, 0.12);
+  background: #ffffff;
 }
 
 .hidden:active {

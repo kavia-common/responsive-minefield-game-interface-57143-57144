@@ -15,6 +15,10 @@
   overflow: auto;
 }
 
+.disabled {
+  filter: saturate(0.92);
+}
+
 /* For very large boards, slightly reduce gaps on small screens */
 @media (max-width: 520px) {
   .grid {

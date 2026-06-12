@@ -1,6 +1,7 @@
 import styles from './TopPanel.module.css'
 import type { DifficultyId } from '../../types/difficulty'
 import { DIFFICULTY_PRESETS } from '../../types/difficulty'
+import type { GameStatus } from '../../game/engine'
 
 type TopPanelProps = {
   mineCount: number
@@ -9,12 +10,15 @@ type TopPanelProps = {
   difficultyId: DifficultyId
   onChangeDifficulty: (id: DifficultyId) => void
   onReset: () => void
+  status: GameStatus
 }
 
 // PUBLIC_INTERFACE
 export function TopPanel(props: TopPanelProps) {
   /** Top panel for Minesweeper: mine counter, timer, difficulty selector, reset button. */
-  const { mineCount, minesRemaining, secondsElapsed, difficultyId, onChangeDifficulty, onReset } = props
+  const { mineCount, minesRemaining, secondsElapsed, difficultyId, onChangeDifficulty, onReset, status } = props
+  const isInProgress = status === 'playing' || status === 'ready'
+  const isLocked = status === 'playing'
 
   return (
     <div className={styles.wrap} aria-label="Game controls">
@@ -39,12 +43,15 @@ export function TopPanel(props: TopPanelProps) {
 
       <div className={styles.right}>
         <label className={styles.selectWrap}>
-          <span className={styles.selectLabel}>Difficulty</span>
+          <span className={styles.selectLabel}>
+            Difficulty{!isInProgress ? ' (finished)' : isLocked ? ' (locked)' : ''}
+          </span>
           <select
             className={styles.select}
             value={difficultyId}
             onChange={(e) => onChangeDifficulty(e.target.value as DifficultyId)}
             aria-label="Select difficulty"
+            disabled={isLocked}
           >
             {Object.values(DIFFICULTY_PRESETS).map((p) => (
               <option key={p.id} value={p.id}>

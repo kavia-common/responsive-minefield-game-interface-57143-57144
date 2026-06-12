@@ -7,8 +7,11 @@ type CellButtonProps = {
   isFlagged: boolean
   isMine: boolean
   adjacentMines: number
+  disabled?: boolean
   onReveal: () => void
   onToggleFlag: () => void
+  onTouchStart?: (e: React.TouchEvent) => void
+  onTouchEnd?: (e: React.TouchEvent) => void
 }
 
 function numberColor(n: number): string {
@@ -37,26 +40,58 @@ function numberColor(n: number): string {
 
 // PUBLIC_INTERFACE
 export function CellButton(props: CellButtonProps) {
-  /** A single minefield cell. Shows placeholder visuals; game behavior wired in later steps. */
-  const { row, col, isRevealed, isFlagged, isMine, adjacentMines, onReveal, onToggleFlag } = props
+  /** A single minefield cell. Supports click (reveal), right-click (flag), and long-press flag on touch devices. */
+  const {
+    row,
+    col,
+    isRevealed,
+    isFlagged,
+    isMine,
+    adjacentMines,
+    disabled = false,
+    onReveal,
+    onToggleFlag,
+    onTouchStart,
+    onTouchEnd
+  } = props
 
   const label = `Row ${row + 1}, Column ${col + 1}`
-  const content = isFlagged ? '⚑' : isRevealed ? (isMine ? '●' : adjacentMines || '') : ''
+
+  const showMine = isRevealed && isMine
+  const content = isFlagged ? '⚑' : showMine ? '●' : isRevealed ? adjacentMines || '' : ''
+
+  const ariaLabel = isFlagged
+    ? `${label}, flagged`
+    : isRevealed
+      ? showMine
+        ? `${label}, mine`
+        : adjacentMines > 0
+          ? `${label}, ${adjacentMines} adjacent mines`
+          : `${label}, empty`
+      : label
 
   return (
     <button
       type="button"
+      disabled={disabled}
       className={[
         styles.cell,
         isRevealed ? styles.revealed : styles.hidden,
-        isFlagged ? styles.flagged : ''
+        isFlagged ? styles.flagged : '',
+        disabled ? styles.disabled : ''
       ].join(' ')}
-      onClick={onReveal}
+      onClick={() => {
+        if (disabled) return
+        onReveal()
+      }}
       onContextMenu={(e) => {
         e.preventDefault()
+        if (disabled) return
         onToggleFlag()
       }}
-      aria-label={label}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      aria-label={ariaLabel}
       aria-pressed={isFlagged}
       style={
         isRevealed && !isMine && adjacentMines > 0
