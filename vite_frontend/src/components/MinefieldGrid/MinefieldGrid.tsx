@@ -1,24 +1,19 @@
 import styles from './MinefieldGrid.module.css'
 import { CellButton } from '../CellButton/CellButton'
-
-type PlaceholderCell = {
-  id: string
-  isRevealed: boolean
-  isFlagged: boolean
-  isMine: boolean
-  adjacentMines: number
-}
+import type { Board } from '../../game/engine'
 
 type MinefieldGridProps = {
   rows: number
   cols: number
-  board: PlaceholderCell[][]
+  board: Board
+  onRevealCell: (row: number, col: number) => void
+  onToggleFlag: (row: number, col: number) => void
 }
 
 // PUBLIC_INTERFACE
 export function MinefieldGrid(props: MinefieldGridProps) {
-  /** Presentational grid for the minefield. Game behavior is wired in later steps. */
-  const { rows, cols, board } = props
+  /** Presentational grid for the minefield. Receives engine board + callbacks. */
+  const { rows, cols, board, onRevealCell, onToggleFlag } = props
 
   return (
     <div
@@ -42,12 +37,8 @@ export function MinefieldGrid(props: MinefieldGridProps) {
             isFlagged={cell.isFlagged}
             isMine={cell.isMine}
             adjacentMines={cell.adjacentMines}
-            onReveal={() => {
-              // no-op placeholder (engine later)
-            }}
-            onToggleFlag={() => {
-              // no-op placeholder (engine later)
-            }}
+            onReveal={() => onRevealCell(r, c)}
+            onToggleFlag={() => onToggleFlag(r, c)}
           />
         ))
       )}

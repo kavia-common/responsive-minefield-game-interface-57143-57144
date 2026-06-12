@@ -4,18 +4,10 @@ import { TopPanel } from './components/TopPanel/TopPanel'
 import { MinefieldGrid } from './components/MinefieldGrid/MinefieldGrid'
 import type { DifficultyId, DifficultyPreset } from './types/difficulty'
 import { DIFFICULTY_PRESETS } from './types/difficulty'
+import { createNewGame, revealCell, toggleFlag, type GameState } from './game/engine'
 
-function makePlaceholderBoard(rows: number, cols: number) {
-  // UI scaffold only: we render a clickable-looking grid while the game engine is implemented in step 2.
-  return Array.from({ length: rows }, (_, r) =>
-    Array.from({ length: cols }, (_, c) => ({
-      id: `${r}:${c}`,
-      isRevealed: false,
-      isFlagged: false,
-      isMine: false,
-      adjacentMines: 0
-    }))
-  )
+function newGameFromPreset(preset: DifficultyPreset): GameState {
+  return createNewGame(preset.rows, preset.cols, preset.mines)
 }
 
 // PUBLIC_INTERFACE
@@ -23,11 +15,21 @@ export default function App() {
   /** Application shell for Minesweeper UI (top panel + minefield grid). */
   const [difficultyId, setDifficultyId] = useState<DifficultyId>('beginner')
 
-  const preset: DifficultyPreset = useMemo(() => {
-    return DIFFICULTY_PRESETS[difficultyId]
-  }, [difficultyId])
+  const preset: DifficultyPreset = useMemo(() => DIFFICULTY_PRESETS[difficultyId], [difficultyId])
 
-  const board = useMemo(() => makePlaceholderBoard(preset.rows, preset.cols), [preset.rows, preset.cols])
+  const [game, setGame] = useState<GameState>(() => newGameFromPreset(preset))
+
+  // When difficulty changes, immediately create a new board for that preset.
+  // (Timer/state wiring is a later step; engine is complete in this step.)
+  const applyDifficulty = (id: DifficultyId) => {
+    setDifficultyId(id)
+    const nextPreset = DIFFICULTY_PRESETS[id]
+    setGame(newGameFromPreset(nextPreset))
+  }
+
+  const reset = () => {
+    setGame(newGameFromPreset(preset))
+  }
 
   return (
     <div className={styles.page}>
@@ -42,25 +44,28 @@ export default function App() {
         <section className={styles.gameCard} aria-label="Minesweeper game">
           <TopPanel
             mineCount={preset.mines}
-            minesRemaining={preset.mines}
+            minesRemaining={game.minesRemaining}
             secondsElapsed={0}
             difficultyId={difficultyId}
-            onChangeDifficulty={setDifficultyId}
-            onReset={() => {
-              // In step 2/3, this will create a new game board and reset timer/state.
-              // For now, we simply keep UI structure in place.
-              setDifficultyId((d) => d)
-            }}
+            onChangeDifficulty={applyDifficulty}
+            onReset={reset}
           />
 
           <div className={styles.gridWrap}>
-            <MinefieldGrid rows={preset.rows} cols={preset.cols} board={board} />
+            <MinefieldGrid
+              rows={preset.rows}
+              cols={preset.cols}
+              board={game.board}
+              onRevealCell={(r, c) => setGame((g) => revealCell(g, r, c))}
+              onToggleFlag={(r, c) => setGame((g) => toggleFlag(g, r, c))}
+            />
           </div>
         </section>
 
         <footer className={styles.footer}>
           <span className={styles.footerHint}>
             Desktop: left click reveal, right click flag. Mobile: flagging UX added in a later step.
+            {game.status === 'won' ? ' You won!' : game.status === 'lost' ? ' Boom! You lost.' : ''}
           </span>
         </footer>
       </main>
