@@ -112,8 +112,9 @@ describe('game engine', () => {
     expect(getCell(g2, 0, 0).isFlagged).toBe(true)
     expect(getCell(g2, 0, 0).isRevealed).toBe(false)
 
-    // With mineCount 0 and all safe cells revealed, game should be won.
-    expect(g2.status).toBe('won')
+    // Engine win condition is "all non-mine cells are revealed". Since flagged cells are not auto-revealed,
+    // leaving a flagged/hidden safe cell means the game remains in progress.
+    expect(g2.status).toBe('playing')
   })
 
   it('revealCell triggers loss if clicking a mine after mines are placed (seeded)', () => {
