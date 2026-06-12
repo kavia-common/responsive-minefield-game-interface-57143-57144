@@ -39,18 +39,20 @@ describe('Minesweeper UI (App integration)', () => {
     vi.useFakeTimers()
     render(<App />)
 
-    // MinefieldGrid attaches touch handlers to the grid container (role="grid"),
-    // not to the individual cell buttons. So we must dispatch touch events to the grid,
-    // while using the cell label only to confirm state changes.
-    const grid = screen.getByRole('grid', { name: 'Minefield' })
+    // MinefieldGrid wires long-press handlers per-cell (CellButton onTouchStart/onTouchEnd).
+    // So we must dispatch the touch sequence on the intended cell button itself.
+    const targetCell = screen.getByRole('button', { name: 'Row 2, Column 1' })
 
     // Create a touch event with a single touch point.
+    // (The handler reads e.touches[0].clientX/Y to detect movement thresholds.)
     const touch = { clientX: 10, clientY: 10 }
-    fireEvent.touchStart(grid, { touches: [touch] })
 
-    // Long press threshold is 420ms in MinefieldGrid.
+    // Wrap event + timer advancement in act() to flush the state update from setTimeout -> onToggleFlag.
     act(() => {
+      fireEvent.touchStart(targetCell, { touches: [touch] })
+      // Long press threshold is 420ms in MinefieldGrid.
       vi.advanceTimersByTime(450)
+      fireEvent.touchEnd(targetCell, { changedTouches: [touch] })
     })
 
     const flagged = screen.getByRole('button', { name: 'Row 2, Column 1, flagged' })
