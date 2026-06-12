@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import App from '../App'
 
 describe('Minesweeper UI (App integration)', () => {
@@ -39,14 +39,19 @@ describe('Minesweeper UI (App integration)', () => {
     vi.useFakeTimers()
     render(<App />)
 
-    const cell = screen.getByRole('button', { name: 'Row 2, Column 1' })
+    // MinefieldGrid attaches touch handlers to the grid container (role="grid"),
+    // not to the individual cell buttons. So we must dispatch touch events to the grid,
+    // while using the cell label only to confirm state changes.
+    const grid = screen.getByRole('grid', { name: 'Minefield' })
 
     // Create a touch event with a single touch point.
     const touch = { clientX: 10, clientY: 10 }
-    fireEvent.touchStart(cell, { touches: [touch] })
+    fireEvent.touchStart(grid, { touches: [touch] })
 
     // Long press threshold is 420ms in MinefieldGrid.
-    vi.advanceTimersByTime(450)
+    act(() => {
+      vi.advanceTimersByTime(450)
+    })
 
     const flagged = screen.getByRole('button', { name: 'Row 2, Column 1, flagged' })
     expect(flagged).toBeInTheDocument()
